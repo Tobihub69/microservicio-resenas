@@ -1,0 +1,57 @@
+{
+  "create1": {
+    "status": 201,
+    "body": {
+      "producto_id": 1,
+      "usuario_id": 42,
+      "calificacion": 5,
+      "comentario": "Excelente",
+      "id": 1,
+      "fecha": "2026-08-18T23:56:17.022356"
+    }
+  },
+  "create2": {
+    "status": 201,
+    "body": {
+      "producto_id": 1,
+      "usuario_id": 43,
+      "calificacion": 4,
+      "comentario": "Bueno",
+      "id": 2,
+      "fecha": "2026-08-18T23:56:17.055292"
+    }
+  },
+  "list": {
+    "status": 200,
+    "body": [
+      {
+        "producto_id": 1,
+        "usuario_id": 43,
+        "calificacion": 4,
+        "comentario": "Bueno",
+        "id": 2,
+        "fecha": "2026-08-18T23:56:17.055292"
+      },
+      {
+        "producto_id": 1,
+        "usuario_id": 42,
+        "calificacion": 5,
+        "comentario": "Excelente",
+        "id": 1,
+        "fecha": "2026-08-18T23:56:17.022356"
+      }
+    ]
+  },
+  "avg": {
+    "status": 200,
+    "body": {
+      "producto_id": 1,
+      "promedio": 4.5,
+      "cantidad": 2
+    }
+  },
+  "delete1": {
+    "status": 204,
+    "body": ""
+  }
+}
