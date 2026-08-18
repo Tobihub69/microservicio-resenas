@@ -1,5 +1,7 @@
 # Microservicio de Reseñas
 
+![CI](https://github.com/Tobihub69/microservicio-resenas/actions/workflows/ci.yml/badge.svg)
+
 Servicio para permitir a los usuarios calificar y comentar productos.
 
 Características principales:
