@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+db/reviews.db
+.env
+*.sqlite3

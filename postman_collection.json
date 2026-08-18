@@ -1,0 +1,43 @@
+{
+  "info": {
+    "name": "Microservicio-Resenas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Crear reseña",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"producto_id\":1,\"usuario_id\":42,\"calificacion\":5,\"comentario\":\"Excelente\"}"
+        },
+        "url": { "raw": "http://127.0.0.1:8000/resenas", "protocol": "http", "host": ["127.0.0.1"], "port": "8000", "path": ["resenas"] }
+      }
+    },
+    {
+      "name": "Listar reseñas por producto",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:8000/resenas?producto_id=1", "protocol": "http", "host": ["127.0.0.1"], "port": "8000", "path": ["resenas"], "query": [{ "key": "producto_id", "value": "1" }] }
+      }
+    },
+    {
+      "name": "Eliminar reseña",
+      "request": {
+        "method": "DELETE",
+        "url": { "raw": "http://127.0.0.1:8000/resenas/1", "protocol": "http", "host": ["127.0.0.1"], "port": "8000", "path": ["resenas","1"] }
+      }
+    },
+    {
+      "name": "Promedio producto",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "http://127.0.0.1:8000/productos/1/promedio", "protocol": "http", "host": ["127.0.0.1"], "port": "8000", "path": ["productos","1","promedio"] }
+      }
+    }
+  ]
+}
