@@ -1,0 +1,12 @@
+{
+  "info": {
+    "title": "Microservicio de Reseñas",
+    "version": "1.0"
+  },
+  "endpoints_sample": [
+    "POST /resenas",
+    "GET /resenas?producto_id=",
+    "DELETE /resenas/{id}",
+    "GET /productos/{id}/promedio"
+  ]
+}

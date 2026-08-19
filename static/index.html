@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Microservicio Reseñas — Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root{--bg:#0b1220;--card:#0f1724;--muted:#94a3b8;--accent:#2563eb;--panel:#0b1220}
+      *{box-sizing:border-box}
+      body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#071029 0%, #071827 100%);color:#e6eef8;padding:28px}
+      .container{max-width:960px;margin:12px auto}
+      .card{background:linear-gradient(180deg,#0f1724aa,#0b1220);padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+      label{display:block;font-size:13px;color:var(--muted);margin-top:10px}
+      input,textarea,select{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #263347;background:transparent;color:inherit}
+      button{background:var(--accent);color:white;padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+      h1{margin:0 0 8px;font-size:20px}
+      .reviews{margin-top:18px}
+      .review{border-top:1px solid #0f2233;padding:12px 0;display:flex;gap:12px}
+      .left{width:64px;height:64px;border-radius:8px;background:#021124;display:flex;align-items:center;justify-content:center;font-weight:700}
+      .meta{color:var(--muted);font-size:13px}
+      .muted{color:var(--muted);font-size:13px}
+      .row{display:flex;gap:12px}
+      .top-actions{display:flex;gap:12px;align-items:center;margin-top:12px}
+      .notice{padding:10px;border-radius:8px;margin-top:12px}
+      .success{background:#082915;color:#b7f3c6}
+      .error{background:#330a0a;color:#ffc9c9}
+      .loader{width:14px;height:14px;border:2px solid rgba(255,255,255,0.15);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin 1s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Reseñas — Demo</h1>
+      <p class="muted">Interfaz simple para probar el microservicio de reseñas.</p>
+
+      <form id="form" autocomplete="off">
+        <label>Producto ID</label>
+        <input id="producto_id" type="number" value="1" required />
+        <label>Usuario ID</label>
+        <input id="usuario_id" type="number" value="42" required />
+        <label>Calificación (1-5)</label>
+        <select id="calificacion">
+          <option>5</option>
+          <option>4</option>
+          <option>3</option>
+          <option>2</option>
+          <option>1</option>
+        </select>
+        <label>Comentario</label>
+        <textarea id="comentario" rows="2">Muy buen producto</textarea>
+        <div style="margin-top:8px"><button id="submitBtn" type="submit">Enviar reseña</button></div>
+      </form>
+
+      <div style="margin-top:18px">
+        <div class="top-actions">
+          <button id="refresh">Refrescar reseñas</button>
+          <div id="avg" class="muted" style="margin-left:12px"></div>
+          <div style="margin-left:auto" id="statusMsg"></div>
+        </div>
+      </div>
+
+      <div class="reviews" id="reviews"></div>
+    </div>
+
+    <script>
+      const BASE = location.origin
+      const reviewsEl = document.getElementById('reviews')
+      const avgEl = document.getElementById('avg')
+
+
+      function starStr(n){ return '★'.repeat(n)+'☆'.repeat(5-n) }
+
+      async function fetchReviews(){
+        const pid = document.getElementById('producto_id').value
+        const res = await fetch(`${BASE}/resenas?producto_id=${pid}`)
+        if(!res.ok) { reviewsEl.innerHTML = '<div class="muted">No se pudieron cargar reseñas.</div>'; return }
+        const data = await res.json()
+        reviewsEl.innerHTML = ''
+        if(!data.length){ reviewsEl.innerHTML = '<div class="muted">No hay reseñas para este producto.</div>'; return }
+        data.forEach(r => {
+          const el = document.createElement('div')
+          el.className = 'review'
+          el.innerHTML = `<div class="left">${r.calificacion}★</div><div style="flex:1"><div style="font-weight:600">${r.comentario || '(sin comentario)'} </div><div class="meta">${starStr(r.calificacion)} • usuario ${r.usuario_id} • ${new Date(r.fecha).toLocaleString()}</div></div>`
+          reviewsEl.appendChild(el)
+        })
+      }
+
+      async function fetchAvg(){
+        const pid = document.getElementById('producto_id').value
+        const res = await fetch(`${BASE}/productos/${pid}/promedio`)
+        const data = await res.json()
+        if(data.promedio===null) avgEl.textContent = 'Sin reseñas aún'
+        else avgEl.textContent = `Promedio: ${data.promedio.toFixed(2)} (${data.cantidad})`
+      }
+
+      document.getElementById('form').addEventListener('submit', async e=>{
+        e.preventDefault()
+        const btn = document.getElementById('submitBtn')
+        const pid = Number(document.getElementById('producto_id').value)
+        const uid = Number(document.getElementById('usuario_id').value)
+        const cal = Number(document.getElementById('calificacion').value)
+        if(!pid || !uid){ showStatus('Producto y Usuario obligatorios','error'); return }
+        if(cal<1 || cal>5){ showStatus('Calificación debe ser 1-5','error'); return }
+        const payload = { producto_id: pid, usuario_id: uid, calificacion: cal, comentario: document.getElementById('comentario').value }
+        btn.disabled = true; const prev = btn.innerHTML; btn.innerHTML = '<span class="loader"></span> Enviando'
+        clearStatus()
+        try{
+          const res = await fetch(`${BASE}/resenas`, {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)})
+          if(res.ok){
+            document.getElementById('comentario').value = ''
+            showStatus('Reseña creada','success')
+            await fetchReviews();
+            await fetchAvg();
+          } else {
+            const err = await res.json().catch(()=>({detail:'Error'}))
+            showStatus(err.detail || JSON.stringify(err),'error')
+          }
+        } catch(ex){ showStatus('Error de conexión','error') }
+        btn.disabled = false; btn.innerHTML = prev
+      })
+
+      function showStatus(msg,type){ const s = document.getElementById('statusMsg'); s.className = 'notice '+(type==='success'?'success':'error'); s.textContent = msg }
+      function clearStatus(){ const s=document.getElementById('statusMsg'); s.className=''; s.textContent='' }
+
+      document.getElementById('refresh').addEventListener('click', async ()=>{ await fetchReviews(); await fetchAvg(); })
+
+      // initial load
+      fetchReviews(); fetchAvg();
+    </script>
+  </body>
+</html>

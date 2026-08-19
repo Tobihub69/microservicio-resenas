@@ -1,0 +1,47 @@
+{
+  "post_no_key": {
+    "status": 401,
+    "text": "{\"detail\":\"Invalid or missing API Key\"}"
+  },
+  "post_with_key": {
+    "status": 201,
+    "body": {
+      "producto_id": 99,
+      "usuario_id": 999,
+      "calificacion": 5,
+      "comentario": "Prueba auth",
+      "id": 3,
+      "fecha": "2026-08-19T00:37:08.504596"
+    }
+  },
+  "list": {
+    "status": 200,
+    "body": {
+      "items": [
+        {
+          "id": 3,
+          "usuario_id": 999,
+          "calificacion": 5,
+          "producto_id": 99,
+          "comentario": "Prueba auth",
+          "fecha": "2026-08-19T00:37:08.504596"
+        }
+      ],
+      "total": 1,
+      "page": 1,
+      "size": 10
+    }
+  },
+  "avg": {
+    "status": 200,
+    "body": {
+      "producto_id": 99,
+      "promedio": 5.0,
+      "cantidad": 1
+    }
+  },
+  "delete": {
+    "status": 204,
+    "text": ""
+  }
+}

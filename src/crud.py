@@ -18,9 +18,26 @@ def create_review(session: Session, review_in: ReviewCreate) -> Review:
     return review
 
 
-def get_reviews_by_product(session: Session, producto_id: int) -> List[Review]:
-    stmt = select(Review).where(Review.producto_id == producto_id).order_by(Review.fecha.desc())
-    return session.exec(stmt).all()
+def get_reviews(
+    session: Session,
+    producto_id: Optional[int] = None,
+    usuario_id: Optional[int] = None,
+    min_calificacion: Optional[int] = None,
+    offset: int = 0,
+    limit: int = 10,
+) -> Tuple[List[Review], int]:
+    q = select(Review)
+    if producto_id is not None:
+        q = q.where(Review.producto_id == producto_id)
+    if usuario_id is not None:
+        q = q.where(Review.usuario_id == usuario_id)
+    if min_calificacion is not None:
+        q = q.where(Review.calificacion >= min_calificacion)
+    total = session.exec(select(func.count(Review.id)).where(q.whereclause) if q.whereclause is not None else select(func.count(Review.id))).one()
+    # order and paginate
+    q = q.order_by(Review.fecha.desc()).offset(offset).limit(limit)
+    items = session.exec(q).all()
+    return items, int(total)
 
 
 def delete_review(session: Session, id: int) -> bool:

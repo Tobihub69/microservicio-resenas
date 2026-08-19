@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  reviews:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app:cached
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_KEY=changeme
