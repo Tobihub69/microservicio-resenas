@@ -128,3 +128,23 @@ Consideraciones
 
 - Este servicio es autónomo y no depende de otros microservicios en tiempo de ejecución.
 - Se evita que un mismo usuario califique dos veces el mismo producto (devuelve 409).
+
+Despliegue automático (GitHub)
+
+Se incluyen dos workflows en `.github/workflows/`:
+
+- `publish-ghcr.yml`: construye la imagen Docker y la publica en GitHub Container Registry (`ghcr.io/<owner>/microservicio-resenas`).
+- `deploy-cloudrun.yml`: construye la imagen y despliega a Google Cloud Run (requiere secretos GCP).
+
+Para habilitar despliegue a GHCR no se necesitan secretos adicionales (usa `GITHUB_TOKEN`). Para desplegar a Cloud Run añade estos secrets en tu repo Settings → Secrets:
+
+- `GCP_SA_KEY`: contenido JSON de la Service Account (con permisos Cloud Run Admin, Storage Admin, Service Account User).
+- `GCP_PROJECT`: ID del proyecto GCP.
+- `CLOUD_RUN_REGION`: región (ej. `us-central1`).
+
+Después de añadir los secrets, cualquier push a `main` disparará los workflows.
+
+Ver imagen publicada en GHCR (si el workflow se ejecuta):
+
+`https://ghcr.io/${{ github.repository_owner }}/microservicio-resenas` (revisa la pestaña "Packages" en GitHub).
+
